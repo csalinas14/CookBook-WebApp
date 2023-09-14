@@ -3,8 +3,9 @@ const recipesRouter = require("express").Router();
 const Recipe = require("../models/recipe");
 const User = require("../models/user");
 const { userExtractor } = require("../utils/middleware");
+const config = require("../utils/config");
 
-const apiKey = "ef9e7bcc61fd481b946adccb6b1e2e4e";
+const apiKey = config.API_KEY;
 const baseUrl = "https://api.spoonacular.com/recipes/";
 
 recipesRouter.get("/", async (request, response) => {
