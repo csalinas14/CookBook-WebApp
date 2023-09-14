@@ -1,5 +1,8 @@
 const axios = require("axios");
 const recipesRouter = require("express").Router();
+const Recipe = require("../models/recipe");
+const User = require("../models/user");
+const { userExtractor } = require("../utils/middleware");
 
 const apiKey = "ef9e7bcc61fd481b946adccb6b1e2e4e";
 const baseUrl = "https://api.spoonacular.com/recipes/";
@@ -53,6 +56,16 @@ recipesRouter.get("/", async (request, response) => {
   const recipesInfo = await axios.request(config2);
   console.log(recipesInfo);
   response.json(recipesInfo.data);
+});
+
+recipesRouter.post("/", userExtractor, async (request, response) => {
+  const body = request.body;
+
+  if (!body) {
+    response.status(400).end();
+  }
+
+  const user = await User.findById(request.user);
 });
 
 module.exports = recipesRouter;

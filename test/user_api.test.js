@@ -59,7 +59,68 @@ describe("initially one user in db", () => {
       .expect("Content-Type", /application\/json/);
 
     expect(result.body.error).toContain("expected `username` to be unique");
-    console.log(result.body.error);
+    //console.log(result.body.error);
+  });
+
+  test("creation fails with proper statuscode and message is invalid password length", async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: "newUser",
+      name: "SuperUser",
+      password: "short",
+    };
+
+    const result = await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
+
+    expect(result.body.error).toContain("Invalid password length");
+
+    const usersAtEnd = await helper.usersInDb();
+    expect(usersAtEnd).toEqual(usersAtStart);
+  });
+
+  test("creation fails with proper statuscode and message when no user is defined", async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      name: "SuperUser",
+      password: "banana",
+    };
+
+    const result = await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
+
+    expect(result.body.error).toContain("Path `username` is required");
+
+    const usersAtEnd = await helper.usersInDb();
+    expect(usersAtEnd).toEqual(usersAtStart);
+  });
+
+  test("creation fails with proper statuscode and message when no password is defined", async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: "test",
+      name: "SuperUser",
+    };
+
+    const result = await api
+      .post("/api/users")
+      .send(newUser)
+      .expect(400)
+      .expect("Content-Type", /application\/json/);
+
+    expect(result.body.error).toContain("No password provided");
+
+    const usersAtEnd = await helper.usersInDb();
+    expect(usersAtEnd).toEqual(usersAtStart);
   });
 });
 
