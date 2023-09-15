@@ -6,67 +6,53 @@ const { userExtractor } = require("../utils/middleware");
 const config = require("../utils/config");
 
 const apiKey = config.API_KEY;
-const baseUrl = "https://api.spoonacular.com/recipes/";
+const baseUrl = config.API_BASEURL;
 
 recipesRouter.get("/", async (request, response) => {
-  const tempRecipes = {
-    results: [
-      {
-        id: 631814,
-        title: "$50,000 Burger",
-        image: "https://spoonacular.com/recipeImages/631814-312x231.jpg",
-        imageType: "jpg",
-      },
-      {
-        id: 642539,
-        title: "Falafel Burger",
-        image: "https://spoonacular.com/recipeImages/642539-312x231.png",
-        imageType: "png",
-      },
-    ],
-    offset: 0,
-    number: 2,
-    totalResults: 54,
-  };
   const body = request.body;
 
   if (!body.recipe) {
     response.status(400).end();
   }
-  console.log(body);
   let config = {
     method: "get",
     maxBodyLength: Infinity,
     url: `${baseUrl}complexSearch?query=${body.recipe}&number=2&apiKey=${apiKey}`,
     headers: {},
   };
-  //let recipesJson = tempRecipes;
-  const recipesJson = await axios.request(config);
-  //recipesJson = JSON.stringify(recipesData.data);
+  const recipesInfo = await axios.request(config);
 
-  //console.log(recipesJson.data);
+  //old api additional call
+  /*
   const recipesId = recipesJson.data.results.map((r) => r.id);
-  //console.log(recipesId);
   const recipesIdString = recipesId.join(",");
-  console.log(recipesIdString);
 
   const config2 = {
     ...config,
     url: `https://api.spoonacular.com/recipes/informationBulk?apiKey=${apiKey}&ids=${recipesIdString}`,
   };
   const recipesInfo = await axios.request(config2);
-  console.log(recipesInfo);
+  */
   response.json(recipesInfo.data);
 });
 
 recipesRouter.post("/", userExtractor, async (request, response) => {
   const body = request.body;
 
-  if (!body) {
-    response.status(400).end();
-  }
-
   const user = await User.findById(request.user);
+
+  const recipeInDb = await Recipe.findOne(body.spoonId);
+
+  let savedRecipe;
+
+  if (recipeInDb) {
+    recipeInDb.users = recipeInDb.users.concat(user._id);
+    savedRecipe = await recipeInDb.save();
+    await savedRecipe.populate("users");
+    user.recipes = user.recipes.concat(recipeInDb._id);
+    await user.save();
+  }
+  response.status(201).json(savedRecipe);
 });
 
 module.exports = recipesRouter;

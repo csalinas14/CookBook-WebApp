@@ -5,16 +5,25 @@ const User = require("../models/user");
 usersRouter.post("/", async (request, response) => {
   const { username, name, password } = request.body;
 
+  /*
   if (!password) {
     return response.status(400).json({
       error: "No password provided",
     });
   }
-
-  if (password.length < 6) {
-    return response.status(400).json({
-      error: "Invalid password length",
-    });
+  */
+  try {
+    if (password.length < 6) {
+      return response.status(400).json({
+        error: "Invalid password length",
+      });
+    }
+  } catch (error) {
+    if (error instanceof TypeError) {
+      return response.status(400).json({
+        error: "No password provided",
+      });
+    }
   }
 
   const saltRounds = 10;

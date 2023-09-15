@@ -1,22 +1,25 @@
 const mongoose = require("mongoose");
 
+//spoonacular api allows us to store title, id, and image permanently as preview information
+//this will be used for saving user's favorite recipes in list format and will do an api call
+//when clicked on
 const recipeSchema = new mongoose.Schema({
-  spoonId: Number,
-  title: String,
+  spoonId: {
+    type: Number,
+    required: true,
+    unique: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
   image: String,
-  imageType: String,
-  sourceUrl: String,
-  spoonScore: Number,
-  cheap: Boolean,
-  vegan: Boolean,
-  readyInMinutes: Number,
   users: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
   ],
-  dishTypes: [],
 });
 
 recipeSchema.set("toJSON", {
