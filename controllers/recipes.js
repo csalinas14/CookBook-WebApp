@@ -9,6 +9,12 @@ const apiKey = config.API_KEY;
 const baseUrl = config.API_BASEURL;
 
 recipesRouter.get("/", async (request, response) => {
+  //console.log("hello");
+  const recipes = await Recipe.find({}).populate("users");
+  response.json(recipes);
+});
+
+recipesRouter.get("/recipeSearch", async (request, response) => {
   const body = request.body;
 
   if (!body.recipe) {
@@ -38,9 +44,12 @@ recipesRouter.get("/", async (request, response) => {
 
 recipesRouter.post("/", userExtractor, async (request, response) => {
   const body = request.body;
+  console.log(body);
+  console.log(request.user);
 
   const user = await User.findById(request.user);
 
+  console.log("test");
   const recipeInDb = await Recipe.findOne(body.spoonId);
 
   let savedRecipe;
@@ -48,10 +57,13 @@ recipesRouter.post("/", userExtractor, async (request, response) => {
   if (recipeInDb) {
     recipeInDb.users = recipeInDb.users.concat(user._id);
     savedRecipe = await recipeInDb.save();
-    await savedRecipe.populate("users");
-    user.recipes = user.recipes.concat(recipeInDb._id);
-    await user.save();
+  } else {
+    const recipe = new Recipe(body);
+    savedRecipe = await recipe.save();
   }
+  await savedRecipe.populate("users");
+  user.recipes = user.recipes.concat(recipeInDb._id);
+  await user.save();
   response.status(201).json(savedRecipe);
 });
 
