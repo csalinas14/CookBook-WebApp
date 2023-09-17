@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const uniqueValidator = require("mongoose-unique-validator");
 //spoonacular api allows us to store title, id, and image permanently as preview information
 //this will be used for saving user's favorite recipes in list format and will do an api call
 //when clicked on
@@ -21,6 +21,8 @@ const recipeSchema = new mongoose.Schema({
     },
   ],
 });
+
+recipeSchema.plugin(uniqueValidator);
 
 recipeSchema.set("toJSON", {
   transform: (document, returnedObject) => {

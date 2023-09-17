@@ -29,7 +29,16 @@ const usersInDb = async () => {
   return usersJSON;
 };
 
+const recipesInDb = async () => {
+  const recipes = await Recipe.find({});
+
+  const recipesJson = recipes.map((recipe) => recipe.toJSON());
+
+  return recipesJson;
+};
+
 module.exports = {
   initialRecipes,
   usersInDb,
+  recipesInDb,
 };

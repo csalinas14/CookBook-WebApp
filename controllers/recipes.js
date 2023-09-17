@@ -44,27 +44,46 @@ recipesRouter.get("/recipeSearch", async (request, response) => {
 
 recipesRouter.post("/", userExtractor, async (request, response) => {
   const body = request.body;
-  console.log(body);
-  console.log(request.user);
+  //console.log(body);
+  //console.log(request.user);
+  const spoonId = body.spoonId;
 
   const user = await User.findById(request.user);
 
-  console.log("test");
-  const recipeInDb = await Recipe.findOne(body.spoonId);
+  const recipeInDb = await Recipe.findOne({ spoonId });
+  //console.log(recipeInDb);
 
+  //console.log(savedRecipe);
   let savedRecipe;
 
   if (recipeInDb) {
-    recipeInDb.users = recipeInDb.users.concat(user._id);
+    //recipeInDb.users = recipeInDb.users.concat(user._id);
+    recipeInDb.users.addToSet(user._id);
     savedRecipe = await recipeInDb.save();
+    console.log(savedRecipe);
   } else {
-    const recipe = new Recipe(body);
+    const recipe = new Recipe({ ...body, users: [request.user] });
     savedRecipe = await recipe.save();
   }
+
   await savedRecipe.populate("users");
-  user.recipes = user.recipes.concat(recipeInDb._id);
+  //user.recipes = user.recipes.concat(savedRecipe.id);
+  user.recipes.addToSet(savedRecipe._id);
   await user.save();
   response.status(201).json(savedRecipe);
 });
+
+recipesRouter.delete(
+  "/:id/favorites",
+  userExtractor,
+  async (request, response) => {
+    const body = request.body;
+    const spoonId = body.spoonId;
+
+    const user = await User.findById(request.user);
+
+    const recipeInDb = await Recipe.findById(request.params.id);
+  }
+);
 
 module.exports = recipesRouter;

@@ -4,5 +4,5 @@ content-type: application/json
 {
   "username": "testing_request",
   "name": "SuperUser",
-  "password": "d"
+  "password": "secret"
 }

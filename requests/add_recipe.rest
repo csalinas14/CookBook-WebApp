@@ -1,0 +1,7 @@
+POST http://localhost:3003/api/recipes HTTP/1.1
+content-type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RpbmdfcmVxdWVzdCIsImlkIjoiNjUwNzY3NTc3NGU0ZjVlNmNlN2ZjODM4IiwiaWF0IjoxNjk0OTg0MDk1fQ.fvWj35JOHc4PNU7UE97TXQfjCIGsnHwAmK8vCAnlpLA
+
+{
+  "spoonId": 1
+}
