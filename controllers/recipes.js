@@ -73,17 +73,29 @@ recipesRouter.post("/", userExtractor, async (request, response) => {
   response.status(201).json(savedRecipe);
 });
 
-recipesRouter.delete(
-  "/:id/favorites",
-  userExtractor,
-  async (request, response) => {
-    const body = request.body;
-    const spoonId = body.spoonId;
+recipesRouter.delete("/:id", userExtractor, async (request, response) => {
+  console.log("hello");
+  const recipeId = request.params.id;
+  const user = await User.findById(request.user);
 
-    const user = await User.findById(request.user);
-
-    const recipeInDb = await Recipe.findById(request.params.id);
+  if (!recipeId) {
+    response.status(400).end();
   }
-);
 
+  user.recipes = user.recipes.filter(
+    (recipe) => recipe.toString() !== recipeId.toString()
+  );
+  console.log(user);
+  await user.save();
+
+  const recipe = await Recipe.findById(recipeId);
+  recipe.users = recipe.users.filter((u) => u.toString() !== request.user);
+
+  if (recipe.users.length === 0) {
+    await Recipe.findByIdAndDelete(recipeId);
+  } else {
+    await recipe.save();
+  }
+  response.status(204).end();
+});
 module.exports = recipesRouter;

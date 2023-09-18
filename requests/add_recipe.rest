@@ -1,7 +1,9 @@
 POST http://localhost:3003/api/recipes HTTP/1.1
 content-type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RpbmdfcmVxdWVzdCIsImlkIjoiNjUwNzY3NTc3NGU0ZjVlNmNlN2ZjODM4IiwiaWF0IjoxNjk0OTg0MDk1fQ.fvWj35JOHc4PNU7UE97TXQfjCIGsnHwAmK8vCAnlpLA
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RpbmdfcmVxdWVzdCIsImlkIjoiNjUwN2ZkODgxYWQ4ZDMwOGFmZWI1MTk2IiwiaWF0IjoxNjk1MDIyNTUzfQ.nn-m1m8Y1D-km0t4FnXN68NKueoYQfUgvjICQiVeS1M
 
 {
-  "spoonId": 1
+  "spoonId": 1,
+  "title": "testing_delete",
+  "image": "Doesnt matter"
 }
