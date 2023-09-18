@@ -1,2 +1,2 @@
 DELETE  http://localhost:3003/api/recipes/6507f90dfbb0c6af2bc8ee31 HTTP/1.1
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RpbmdfcmVxdWVzdCIsImlkIjoiNjUwN2ZkODgxYWQ4ZDMwOGFmZWI1MTk2IiwiaWF0IjoxNjk1MDIzMDAyfQ.T3-PlYyqUXAcD8yjwBahvnP8r7r3TEAApyjHDLVipm4
+//Authorization: bearer token here

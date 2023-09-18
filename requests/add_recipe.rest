@@ -1,9 +1,9 @@
 POST http://localhost:3003/api/recipes HTTP/1.1
 content-type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RpbmdfcmVxdWVzdCIsImlkIjoiNjUwN2ZkODgxYWQ4ZDMwOGFmZWI1MTk2IiwiaWF0IjoxNjk1MDIyNTUzfQ.nn-m1m8Y1D-km0t4FnXN68NKueoYQfUgvjICQiVeS1M
+//Authorization: bearer pass token here
 
 {
-  "spoonId": 1,
+  "spoonId": 631814,
   "title": "testing_delete",
   "image": "Doesnt matter"
 }
