@@ -1,6 +1,1 @@
-GET http://localhost:3003/api/recipes HTTP/1.1
-content-type: application/json
-
-{
-  "recipe": "burgers"
-}
+GET http://localhost:3003/api/recipes/recipeSearch?recipe=cake&page=0 HTTP/1.1

@@ -1,32 +1,38 @@
-const axios = require("axios");
-const recipesRouter = require("express").Router();
-const Recipe = require("../models/recipe");
-const User = require("../models/user");
-const { userExtractor } = require("../utils/middleware");
-const config = require("../utils/config");
+const axios = require('axios')
+const recipesRouter = require('express').Router()
+const Recipe = require('../models/recipe')
+const User = require('../models/user')
+const { userExtractor, cacheData } = require('../utils/middleware')
+const config = require('../utils/config')
+const { redisClient } = require('./redis')
 
-const apiKey = config.API_KEY;
-const baseUrl = config.API_BASEURL;
+const apiKey = config.API_KEY
+const baseUrl = config.API_BASEURL
+const DEFAULT_EXPIRATION = 3600
 
-recipesRouter.get("/", async (request, response) => {
+recipesRouter.get('/', async (request, response) => {
   //console.log("hello");
-  const recipes = await Recipe.find({}).populate("users");
-  response.json(recipes);
-});
+  const recipes = await Recipe.find({}).populate('users')
+  response.json(recipes)
+})
 
-recipesRouter.get("/recipeSearch", async (request, response) => {
-  const body = request.body;
-
-  if (!body.recipe) {
-    response.status(400).end();
+recipesRouter.get('/recipeSearch', cacheData, async (request, response) => {
+  //const body = request.body
+  //console.log(request.params)
+  if (!request.query.recipe || request.query.recipe === undefined) {
+    response.status(400).end()
   }
+  //console.log(typeof request.params.page)
+  const recipe = request.query.recipe
+  console.log(recipe)
+  const page = Number(request.query.page) * 10
   let config = {
-    method: "get",
+    method: 'get',
     maxBodyLength: Infinity,
-    url: `${baseUrl}complexSearch?query=${body.recipe}&number=2&apiKey=${apiKey}`,
+    url: `${baseUrl}complexSearch?query=${recipe}&number=2&offSet=${page}&apiKey=${apiKey}`,
     headers: {},
-  };
-  const recipesInfo = await axios.request(config);
+  }
+  const recipesInfo = await axios.request(config)
 
   //old api additional call
   /*
@@ -39,63 +45,77 @@ recipesRouter.get("/recipeSearch", async (request, response) => {
   };
   const recipesInfo = await axios.request(config2);
   */
-  response.json(recipesInfo.data);
-});
+  //console.log(recipesInfo)
+  await redisClient.set(
+    `${recipe}?offset=${page}`,
+    JSON.stringify(recipesInfo.data),
+    {
+      EX: 3600,
+      NX: true,
+    }
+  )
+  console.log('Cache missed')
+  response.json(recipesInfo.data)
+})
 
-recipesRouter.post("/", userExtractor, async (request, response) => {
-  const body = request.body;
+recipesRouter.get('/recipeSearch/:id', async (request, response) => {
+  console.log(request.params.id)
+})
+
+recipesRouter.post('/', userExtractor, async (request, response) => {
+  const body = request.body
   //console.log(body);
   //console.log(request.user);
-  const spoonId = body.spoonId;
+  const spoonId = body.spoonId
 
-  const user = await User.findById(request.user);
+  const user = await User.findById(request.user)
 
-  const recipeInDb = await Recipe.findOne({ spoonId });
+  const recipeInDb = await Recipe.findOne({ spoonId })
   //console.log(recipeInDb);
 
   //console.log(savedRecipe);
-  let savedRecipe;
+  let savedRecipe
 
   if (recipeInDb) {
     //recipeInDb.users = recipeInDb.users.concat(user._id);
-    recipeInDb.users.addToSet(user._id);
-    savedRecipe = await recipeInDb.save();
-    console.log(savedRecipe);
+    recipeInDb.users.addToSet(user._id)
+    savedRecipe = await recipeInDb.save()
+    console.log(savedRecipe)
   } else {
-    const recipe = new Recipe({ ...body, users: [request.user] });
-    savedRecipe = await recipe.save();
+    const recipe = new Recipe({ ...body, users: [request.user] })
+    savedRecipe = await recipe.save()
   }
 
-  await savedRecipe.populate("users");
+  await savedRecipe.populate('users')
   //user.recipes = user.recipes.concat(savedRecipe.id);
-  user.recipes.addToSet(savedRecipe._id);
-  await user.save();
-  response.status(201).json(savedRecipe);
-});
+  user.recipes.addToSet(savedRecipe._id)
+  await user.save()
+  response.status(201).json(savedRecipe)
+})
 
-recipesRouter.delete("/:id", userExtractor, async (request, response) => {
-  console.log("hello");
-  const recipeId = request.params.id;
-  const user = await User.findById(request.user);
+recipesRouter.delete('/:id', userExtractor, async (request, response) => {
+  console.log('hello')
+  const recipeId = request.params.id
+  const user = await User.findById(request.user)
 
   if (!recipeId) {
-    response.status(400).end();
+    response.status(400).end()
   }
 
   user.recipes = user.recipes.filter(
     (recipe) => recipe.toString() !== recipeId.toString()
-  );
-  console.log(user);
-  await user.save();
+  )
+  console.log(user)
+  await user.save()
 
-  const recipe = await Recipe.findById(recipeId);
-  recipe.users = recipe.users.filter((u) => u.toString() !== request.user);
+  const recipe = await Recipe.findById(recipeId)
+  recipe.users = recipe.users.filter((u) => u.toString() !== request.user)
 
   if (recipe.users.length === 0) {
-    await Recipe.findByIdAndDelete(recipeId);
+    await Recipe.findByIdAndDelete(recipeId)
   } else {
-    await recipe.save();
+    await recipe.save()
   }
-  response.status(204).end();
-});
-module.exports = recipesRouter;
+  response.status(204).end()
+})
+module.exports = recipesRouter
