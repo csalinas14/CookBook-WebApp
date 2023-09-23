@@ -10,6 +10,7 @@ const MONGODB_URI =
 const API_KEY = process.env.API_KEY
 
 const API_BASEURL = 'https://api.spoonacular.com/recipes/'
+const RECIPES_PER_PAGE = 2
 
 module.exports = {
   MONGODB_URI,
@@ -17,4 +18,5 @@ module.exports = {
   API_KEY,
   API_BASEURL,
   REDIS_PORT,
+  RECIPES_PER_PAGE,
 }

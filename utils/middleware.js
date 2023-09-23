@@ -54,7 +54,8 @@ const cacheData = async (request, response, next) => {
   }
   const recipe = request.query.recipe
   console.log(recipe)
-  const page = Number(request.query.page) * 10
+  const page = (Number(request.query.page) - 1) * 10
+  console.log(page)
   const cacheResults = await redisClient.get(`${recipe}?offset=${page}`)
   if (cacheResults) {
     const results = JSON.parse(cacheResults)

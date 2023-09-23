@@ -9,6 +9,7 @@ const { redisClient } = require('./redis')
 const apiKey = config.API_KEY
 const baseUrl = config.API_BASEURL
 const DEFAULT_EXPIRATION = 3600
+const recipePerPage = config.RECIPES_PER_PAGE
 
 recipesRouter.get('/', async (request, response) => {
   //console.log("hello");
@@ -25,11 +26,12 @@ recipesRouter.get('/recipeSearch', cacheData, async (request, response) => {
   //console.log(typeof request.params.page)
   const recipe = request.query.recipe
   console.log(recipe)
-  const page = Number(request.query.page) * 10
+  const page = (Number(request.query.page) - 1) * recipePerPage
+  console.log(page)
   let config = {
     method: 'get',
     maxBodyLength: Infinity,
-    url: `${baseUrl}complexSearch?query=${recipe}&number=2&offSet=${page}&apiKey=${apiKey}`,
+    url: `${baseUrl}complexSearch?query=${recipe}&number=${recipePerPage}&offset=${page}&apiKey=${apiKey}`,
     headers: {},
   }
   const recipesInfo = await axios.request(config)
