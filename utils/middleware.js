@@ -16,6 +16,7 @@ const unknownEndpoint = (request, response) => {
 
 const errorHandler = (error, request, response, next) => {
   logger.error(error.message)
+  logger.error(error.name)
   //console.log(error);
 
   if (error.name === 'CastError') {
@@ -65,6 +66,22 @@ const cacheData = async (request, response, next) => {
   next()
 }
 
+const cacheId = async (request, response, next) => {
+  if (!request.params.id || request.params.id === undefined) {
+    return response.status(400).end()
+  }
+
+  const id = request.params.id
+  const cacheResults = await redisClient.get(id)
+
+  if (cacheResults) {
+    const results = JSON.parse(cacheResults)
+    console.log('Cache hit')
+    return response.send(results)
+  }
+  next()
+}
+
 module.exports = {
   requestLogger,
   unknownEndpoint,
@@ -72,4 +89,5 @@ module.exports = {
   tokenExtractor,
   userExtractor,
   cacheData,
+  cacheId,
 }

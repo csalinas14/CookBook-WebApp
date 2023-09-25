@@ -2,7 +2,7 @@ const axios = require('axios')
 const recipesRouter = require('express').Router()
 const Recipe = require('../models/recipe')
 const User = require('../models/user')
-const { userExtractor, cacheData } = require('../utils/middleware')
+const { userExtractor, cacheData, cacheId } = require('../utils/middleware')
 const config = require('../utils/config')
 const { redisClient } = require('./redis')
 
@@ -60,8 +60,28 @@ recipesRouter.get('/recipeSearch', cacheData, async (request, response) => {
   response.json(recipesInfo.data)
 })
 
-recipesRouter.get('/recipeSearch/:id', async (request, response) => {
+recipesRouter.get('/recipeSearch/:id', cacheId, async (request, response) => {
   console.log(request.params.id)
+  const id = request.params.id
+
+  let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: `${baseUrl}${id}/information?includeNutrition=false&apiKey=${apiKey}`,
+    headers: {},
+  }
+
+  //console.log(config)
+
+  const recipeInfo = await axios.request(config)
+
+  await redisClient.set(id, JSON.stringify(recipeInfo.data), {
+    EX: 3600,
+    NX: true,
+  })
+  console.log('Cache missed')
+
+  response.json(recipeInfo.data)
 })
 
 recipesRouter.post('/', userExtractor, async (request, response) => {

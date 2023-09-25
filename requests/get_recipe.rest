@@ -1,1 +1,1 @@
-GET http://localhost:3003/api/recipes/recipeSearch?recipe=cake&page=0 HTTP/1.1
+GET http://localhost:3003/api/recipes/recipeSearch?recipe=cake+pops&page=1 HTTP/1.1
