@@ -1,9 +1,9 @@
 POST http://localhost:3003/api/recipes HTTP/1.1
 content-type: application/json
-//Authorization: bearer pass token here
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RfZmF2b3JpdGUiLCJpZCI6IjY1MTRjZmYwNDg2Y2FhN2JhZGU0MTQ2ZSIsImlhdCI6MTY5NTg2MzYzMn0.rSvrba5mlEqTm26z1Vq5I2e9dVh5FT9mC_LFol1Yq68
 
 {
-  "spoonId": 631814,
-  "title": "testing_delete",
-  "image": "Doesnt matter"
+  "spoonId": 1161745,
+  "title": "Cake Balls",
+  "image": "https://spoonacular.com/recipeImages/1161745-312x231.jpg"
 }

@@ -117,12 +117,15 @@ recipesRouter.post('/', userExtractor, async (request, response) => {
 
 recipesRouter.delete('/:id', userExtractor, async (request, response) => {
   console.log('hello')
-  const recipeId = request.params.id
+  const spoonId = request.params.id
   const user = await User.findById(request.user)
 
-  if (!recipeId) {
+  if (!spoonId) {
     response.status(400).end()
   }
+
+  const recipeInDb = await Recipe.findOne({ spoonId })
+  const recipeId = recipeInDb._id
 
   user.recipes = user.recipes.filter(
     (recipe) => recipe.toString() !== recipeId.toString()

@@ -1,6 +1,9 @@
 const logger = require('./logger')
 const jwt = require('jsonwebtoken')
 const { redisClient } = require('../controllers/redis')
+const config = require('../utils/config')
+
+const recipePerPage = config.RECIPES_PER_PAGE
 
 const requestLogger = (request, response, next) => {
   logger.info('Method:', request.method)
@@ -55,7 +58,7 @@ const cacheData = async (request, response, next) => {
   }
   const recipe = request.query.recipe
   console.log(recipe)
-  const page = (Number(request.query.page) - 1) * 10
+  const page = (Number(request.query.page) - 1) * recipePerPage
   console.log(page)
   const cacheResults = await redisClient.get(`${recipe}?offset=${page}`)
   if (cacheResults) {
